@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/mvc"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<!-- DispatcherServlet Context: defines this servlet's request-processing infrastructure -->
+	
+	<!-- Enables the Spring MVC @Controller programming model -->
+	
+	<!-- #6.1 servlet-context.xml 파일의 내용을 이해하고 넘어가야 한다. -->
+	<!-- 앞으로는 어노테이션을 사용해서 컨트롤러 클래스, 서비스 클래스, DAO 클래스... 이러한 것들을 지정하겠다. -->
+	<annotation-driven />
+
+	<!-- Handles HTTP GET requests for /resources/** by efficiently serving up static resources in the ${webappRoot}/resources directory -->
+	<!-- 
+		이미지파일, 동영상파일, *.js, *.css 등 
+		자바클래스 파일 및 jsp, html 파일을 제외한 나머지 파일들은
+		src/main/webapp/resources/ 아래에 두어야 한다.
+		/resources/** 에서 ** 은 모든 자식 및 자손을 말하며, * 는 직계자식만을 말한다. 
+	--> 
+	<resources mapping="/resources/**" location="/resources/" />
+
+	<!-- Resolves views selected for rendering by @Controllers to .jsp resources in the /WEB-INF/views directory -->
+	<!-- 
+	return "페이지명"; 
+	원래는 return "/WEB-INF/views/home.jsp"; 해야 하는데
+	이렇게 하지 말고
+	return "home"; 이라고 해주면 자동적으로
+	접두어로 /WEB-INF/views/ 이 붙어서 
+	/WEB-INF/views/home 이 되고
+	또한 접미어로 .jsp 이 붙어서
+	최종적으로 /WEB-INF/views/home.jsp 이 된다.
+	즉, return "home"; 은 자동적으로 
+	return "/WEB-INF/views/home.jsp"; 이 된다. 
+	-->
+	<beans:bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<beans:property name="prefix" value="/WEB-INF/views/" />
+		<beans:property name="suffix" value=".jsp" />
+	</beans:bean>
+	
+	<!-- 
+	컨트롤러, 서비스, DAO, DTO(VO) 등 클래스 파일이 위치하는 패키지명 지정하기
+	com.test.spring 해두면 앞으로 생성되어지는 모든 클래스 파일들은
+	com.test.spring 패키지 안에 만들어야 한다.
+	이 패키지 안에 클래스(*.java)파일들이 없으면 404 에러가 발생된다. 
+	그래서 우리는  com.test.* 으로 변경한다.
+	이렇게 변경하면 com.test.* 패키지안에 클래스 파일들이 있으면 된다. 
+	-->
+	<!-- <context:component-scan base-package="com.test.spring" /> -->
+	<context:component-scan base-package="com.spring.*" />
+	
+		<!-- #109. 파일업로드 및 다운로드에 필요한 의존 객체 설정하기 -->
+	<beans:bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">   
+		<beans:property name="maxUploadSize" value="10485760" />
+	</beans:bean>
+	
+</beans:beans>

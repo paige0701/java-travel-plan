@@ -1,0 +1,1849 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="triplandb">
+
+	<!-- ============================================ 가현  ============================================ -->
+
+	<select id="searchArea" resultType="com.spring.model.AreaDetailVO" parameterType="String">
+        select area_code, de_area_code, de_area_name, x, y
+        from tbl_area_detail
+      where de_area_name like '%' || #{de_area_name} || '%'
+    </select>
+    
+    <select id="searchAreaCode" resultType="com.spring.model.AreaDetailVO" parameterType="String">
+    	select area_code, de_area_code, de_area_name, x, y
+    	from tbl_area_detail
+    	where de_area_code = #{de_area_code}
+    </select>
+    
+    <select id="showTourInfo" resultType="com.spring.model.TourInfoVO" parameterType="java.util.HashMap">
+    	select t_idx, t_name, t_addr, t_type, t_rating, t_start_date
+             , t_end_date, t_detail, tx, ty
+        from tbl_tourinfo
+        where 1=0
+	      <if test="de_area_code0 != null">
+	         or to_char(de_area_code) = #{de_area_code0}
+	       </if>
+	       <if test="de_area_code1 != null">
+	         or to_char(de_area_code) = #{de_area_code1}
+	       </if>
+	       <if test="de_area_code2 != null">
+	         or to_char(de_area_code) = #{de_area_code2}
+	       </if>
+	       order by de_area_code
+    </select>
+    
+    <select id="searchTourInfo" resultType="com.spring.model.TourInfoVO" parameterType="java.util.HashMap">
+	      select V.t_idx, V.t_name, V.t_addr, V.t_type, V.t_rating, V.t_start_date
+	           , V.t_end_date, V.t_detail, V.tx, V.ty, V.commentcount
+	      from
+	      (
+	      select A.de_area_code as de_area_code
+	           , A.de_area_name as de_area_name, T.t_idx as t_idx
+	           , T.t_name as t_name, T.t_addr as t_addr, T.t_type as t_type
+	           , T.t_rating as t_rating
+	           , (case when T.t_type = 2 then to_char(T.t_start_date,'hh24:mi') else to_char(T.t_start_date,'yyyy-mm-dd') end) as t_start_date
+	           , (case when T.t_type = 2 then to_char(T.t_end_date,'hh24:mi') else to_char(T.t_end_date,'yyyy-mm-dd') end) as t_end_date
+	           , T.t_detail as t_detail
+	           , T.tx as tx, T.ty as ty, T.commentcount as commentcount
+	      from tbl_area_detail A join tbl_tourinfo T
+	      on T.de_area_code = A.de_area_code
+	      )V
+	      where 1=0
+	      <if test="area1 != null">
+	         or V.de_area_name like '%' || #{area1} || '%'
+	       </if>
+	       <if test="area2 != null">
+	         or V.de_area_name like '%' || #{area2} || '%'
+	       </if>
+	       <if test="area3 != null">
+	         or V.de_area_name like '%' || #{area3} || '%'
+	       </if>
+	       order by V.t_type, V.de_area_code
+    </select>
+    
+    <select id="tourinfo" resultType="com.spring.model.TourInfoVO" parameterType="java.util.HashMap">
+       <if test="t_type == 0" >
+ 
+       select V.t_idx, V.t_name, V.t_addr, V.t_type, V.t_rating, V.t_start_date
+                     , V.t_end_date, V.t_detail
+                     , V.tx, V.ty, V.commentcount
+               from
+               (
+               select A.de_area_code as de_area_code
+                    , A.de_area_name as de_area_name, T.t_idx as t_idx
+                    , T.t_name as t_name, T.t_addr as t_addr, T.t_type as t_type
+                    , T.t_rating as t_rating
+                    , (case when T.t_type = 2 then to_char(T.t_start_date,'hh24:mi') else to_char(T.t_start_date,'yyyy-mm-dd') end) as t_start_date
+                    , (case when T.t_type = 2 then to_char(T.t_end_date,'hh24:mi') else to_char(T.t_end_date,'yyyy-mm-dd') end) as t_end_date
+                    , T.t_detail as t_detail
+                    , T.tx as tx, T.ty as ty, T.commentcount as commentcount
+               from tbl_area_detail A join tbl_tourinfo T
+               on T.de_area_code = A.de_area_code
+               )V
+               where 1=0
+               <if test="area1 != null">
+                  or V.de_area_name like '%' || #{area1} || '%'
+                </if>
+                <if test="area2 != null">
+                  or V.de_area_name like '%' || #{area2} || '%'
+                </if>
+                <if test="area3 != null">
+                  or V.de_area_name like '%' || #{area3} || '%'
+                </if>
+                order by V.t_type, V.de_area_code
+             
+ 
+ 
+       </if>
+       
+       <if test="t_type != 0">
+          select V.t_idx, V.t_name, V.t_addr, V.t_type, V.t_rating, V.t_start_date
+               , V.t_end_date, V.t_detail
+               , V.tx, V.ty, V.commentcount
+         from
+         (
+         select A.de_area_code as de_area_code
+              , A.de_area_name as de_area_name, T.t_idx as t_idx
+              , T.t_name as t_name, T.t_addr as t_addr, T.t_type as t_type
+              , T.t_rating as t_rating
+              , (case when T.t_type = 2 then to_char(T.t_start_date,'hh24:mi') else to_char(T.t_start_date,'yyyy-mm-dd') end) as t_start_date
+              , (case when T.t_type = 2 then to_char(T.t_end_date,'hh24:mi') else to_char(T.t_end_date,'yyyy-mm-dd') end) as t_end_date
+              , T.t_detail as t_detail
+              , T.tx as tx, T.ty as ty, T.commentcount as commentcount
+         from tbl_area_detail A join tbl_tourinfo T
+         on T.de_area_code = A.de_area_code
+         )V
+         where 1=0
+         or  V.de_area_name like '%' || #{area1} || '%'
+
+          and t_type = #{t_type}
+          
+          order by V.t_type, V.de_area_code
+       
+       </if>
+    </select>
+    
+    <select id="detailTourInfo" resultType="com.spring.model.TourInfoVO" parameterType="String">
+    	select t_idx, de_area_code, t_name, t_addr, t_type, round(t_rating) as t_rating, t_start_date
+        	 , t_end_date, t_detail
+        	 , tx, ty, commentcount
+        from tbl_tourinfo
+        where to_char(t_idx) = #{t_idx}
+    </select>
+    
+    <!-- 29일 가현이 추가! -->
+    <select id="getType" resultType="com.spring.model.TourInfoTypeVO">
+    	select *
+        from tbl_tourinfo_type
+    </select>
+    
+    <!-- 29일 가현이 추가! -->
+    <update id="updateTourInfo" parameterType="com.spring.model.TourInfoVO">
+    	update tbl_tourinfo set t_type = #{t_type}, t_name = #{t_name}, de_area_code = #{de_area_code}
+    						  , t_detail = #{t_detail}, t_addr = #{t_addr}, tx = #{tx}, ty = #{ty}
+    	where to_char(t_idx) = #{t_idx}
+    </update>
+    
+    <insert id="addTComment" parameterType="com.spring.model.TourInfoCommVO">
+    	insert into tbl_tourinfocomm(userid, t_idx, content, status, regDate)
+    	values(#{userid}, to_number(#{t_idx}), #{content}, 1, default)
+    </insert>
+    
+    <update id="editTCommentCount" parameterType="String">
+    	update tbl_tourinfo set commentcount = commentcount + 1
+		where to_char(t_idx) = #{t_idx}
+    </update>
+    
+    <!-- <select id="ticommentList" resultType="com.spring.model.TourInfoCommVO" parameterType="String">
+    	select userid, t_idx, content, status, regDate, rating
+    	from tbl_tourinfocomm
+    	where to_char(t_idx) = #{t_idx}
+    </select> -->
+    
+    <select id="ticommentList" resultType="com.spring.model.TourInfoCommVO" parameterType="java.util.HashMap">
+   
+    select userid,content,regDate,rating,t_idx,status
+	from
+		(
+		select row_number()over (order by regDate desc ) as RNO
+		       ,userid
+		       ,content
+		       ,regDate
+		       ,rating
+		       ,t_idx
+		       ,status
+		       
+			from tbl_tourinfocomm
+      where t_idx = #{t_idx}
+		)v
+	<![CDATA[
+	where RNO >= #{start} and RNO <= #{end} 
+	]]>
+	
+    </select>
+    
+    <select id="getTotalCount" parameterType="String" resultType="Integer">
+    	
+		select count(*) as totalCount 
+    	from tbl_tourinfocomm
+      	where t_idx = #{t_idx}
+      
+    </select>
+    
+    <insert id="insertRating">
+    	insert into tbl_rating values(#{t_idx},#{userid},#{rating})
+    </insert>
+    
+    <update id="updateRating" parameterType="String">
+    	update tbl_tourinfo set t_rating = nvl((select avg(t_rating) from tbl_rating where t_idx = #{t_idx}),0)
+		where t_idx = #{t_idx}
+    </update>
+    
+    <select id="findRating" resultType="Integer" >
+    	select count(*) from tbl_rating where t_idx = #{t_idx} and userid = #{userid}
+    </select>
+    
+    <select id="getChat" resultType="com.spring.model.ChatVO" parameterType="String">
+    	select roomNo, userid, chatMsg, to_char(regDate, 'yyyy-mm-dd hh24:mi:ss') as regDate
+    	from tbl_chatroom
+    	where roomNo = #{roomNo}
+    	order by regDate asc
+    </select>
+    
+    <select id="getAreaInfo" resultType="com.spring.model.AreaVO"> <!-- 가현 22일 하던거 -->
+    	select area_code, area_name
+    	from tbl_area
+    	order by area_code asc
+    </select>
+    
+    <select id="getDeAreaInfo" resultType="com.spring.model.AreaDetailVO" parameterType="String"> <!-- 가현 22일 하던거 -->
+    	select area_code, de_area_code, de_area_name
+    	from tbl_area_detail
+    	where area_code = #{area_code}
+    	order by de_area_code asc
+    </select>
+    
+    
+    <insert id="addSchedule" parameterType="java.util.HashMap">
+    	insert into tbl_schedule
+    	values(seq_sc_idx.nextval, #{sc_name}, to_date(#{sc_start_date}, 'yyyy-mm-dd'), to_date(#{sc_end_date}, 'yyyy-mm-dd'), to_date(#{sc_end_date}, 'yyyy-mm-dd')-to_date(#{sc_start_date}, 'yyyy-mm-dd'), null, 0, 0)
+    </insert>
+    
+    <insert id="addScheduleJoin" parameterType="java.util.HashMap">
+    	insert into tbl_join values(#{userid}, seq_sc_idx.currval)
+    </insert>
+    
+    <select id="getNewScheduleIdx" resultType="Integer">
+    	select seq_sc_idx.currval from dual
+    </select>
+    
+        <select id="autoAllSearch" resultType="com.spring.model.AreaDetailVO">
+    	select de_area_code, de_area_name
+    	from tbl_area_detail
+    </select>
+    
+    <!-- ============================================================================================= -->
+    
+    <!-- ============================================ 동규  ============================================ -->
+
+	<insert id="meminsert" parameterType="com.spring.model.MemberVO">
+		insert into tbl_member
+		values(#{userid}, seq_memberidx.nextval, #{password}, #{name}, to_date(#{birth1}||'-'||#{birth2}||'-'||#{birth3}, 'yyyy-mm-dd'), #{gender}, #{email}, #{mobile}, '1')
+	</insert> 
+	
+	<select id="loginchk" parameterType="java.util.HashMap" resultType="int">
+		select case(select count(*) from tbl_member where active=1 and userid=#{id} and password=#{pw})
+        when 1 then 1
+        else(case (select count(*) from tbl_member where active=1 and userid=#{id})
+             when 1 then 0 else -1 end) end as loginck
+		from dual
+	</select>
+	
+	<select id="getmemberInfo" parameterType="String" resultType="com.spring.model.MemberVO">
+		select *
+		from tbl_member
+		where userid=#{id} 
+	</select>
+	
+	
+	<select id="idcheck" parameterType="String" resultType="int">
+		select count(*)
+		from tbl_member
+		where userid=#{userid}
+	</select>
+	
+	<update id="meminfochg" parameterType="java.util.HashMap">
+    	update tbl_member set name=#{name}, password=#{passwd}, mobile=#{pnum}, email=#{email}
+    	where userid = #{userid}
+    </update>
+	
+	<delete id="delFriend" parameterType="HashMap">
+		delete from tbl_friends
+		where id1=#{curID} and id2=#{deluserid}	
+	</delete>
+
+		<select id="getfriendList" parameterType="String" resultType="com.spring.model.MemberVO">
+		select userid, name, email
+		from tbl_member
+		where userid in(
+						select id2
+						from tbl_friends
+						where id1=#{userid})
+	</select>	
+	
+	<select id="myfriendfind" resultType="com.spring.model.MemberVO" parameterType="Hashmap">
+		select userid, name, email
+		from tbl_member
+		where userid in(
+		select id2
+		from tbl_friends
+		where id1=#{userid}
+		<if test="searchID != null ">
+		 and id2 like '%'||#{searchID}||'%'
+		</if> 
+		 )
+	</select>
+	
+	
+			    
+	<!-- ////////////////////////////////////0702 동규 ///////////////////////////////////////////////////	/ -->			    
+	<select id="getmemberList" resultType="com.spring.model.MemberVO" parameterType="String">
+		select * 
+		from tbl_member 
+		where userid not in 
+		( select id2 
+		  from tbl_friends 
+		  where id1=#{curuserid} 
+		) and userid not in #{curuserid} and userid not in(select rev_id from tbl_frdreq_yn where req_id=#{curuserid} and yn =1) 
+	</select>
+	<!-- ////////////////////////////////////0702 동규 ///////////////////////////////////////////////////	/ -->
+	
+	<select id="memberfind" parameterType="HashMap" resultType="com.spring.model.MemberVO">
+		select userid, name, email
+		from tbl_member	
+		where userid like '%'||#{searchID}||'%'
+	</select>
+	
+	<update id="friendAdd" parameterType="HashMap">
+		insert into tbl_friends
+		values(#{curuserid},#{requserid})
+	</update>
+				
+	<update id="friendAdd2" parameterType="HashMap">
+		insert into tbl_friends
+		values(#{requserid},#{curuserid})
+	</update>
+				
+	<insert id="friendreq" parameterType="HashMap">
+		insert into tbl_frdreq_yn
+		values(seq_req.nextval, #{curuserid}, #{adduserid}, default)
+	</insert>
+	
+	
+	<resultMap type="java.util.HashMap" id="yesorno1">
+		<result property="NO" 			column="no"  			javaType="String"/>
+		<result property="REQ_ID" 		column="req_id"  		javaType="String"/>
+		<result property="REV_ID" 		column="rev_id"  		javaType="String"/>
+		<result property="YN" 			column="yn"  			javaType="String"/>
+	</resultMap>
+	
+	<!-- ////////////////////////////////////0702 동규 ///////////////////////////////////////////////////	/ -->
+	<select id="yesorno" parameterType="String" resultMap="yesorno1" >
+		select no, req_id, rev_id, yn
+		from tbl_frdreq_yn
+		where rev_id =#{curuserid} and yn=1
+	</select>
+	<!-- ////////////////////////////////////0702 동규 ///////////////////////////////////////////////////	/ -->
+	
+	
+	<update id="friendOk" parameterType="Hashmap">
+		update tbl_frdreq_yn set yn=0
+		where req_id=#{requserid} and rev_id=#{curuserid}
+	</update>
+	
+	<delete id="friendreqdel" parameterType="Hashmap">
+		delete from tbl_frdreq_yn
+		where req_id=#{requserid} and rev_id=#{curuserid}
+	</delete>
+	
+	
+ 	<resultMap type="java.util.HashMap" id="realtime_kyu">
+		<result property="RNO" 				column="rno"  			javaType="String"/>
+		<result property="SEARCHEDWORD" 	column="searchedword"  	javaType="String"/>
+		<result property="CNT" 				column="cnt"  			javaType="String"/>
+	</resultMap>
+	
+	<select id="realtimeSearch" resultMap="realtime_kyu">
+		select rownum as rno, v.searchedword as searchedword, v.cnt as cnt
+		from 
+		( 
+			select searchedword, count(*) as cnt
+			from tbl_searchedwords
+			group by searchedword
+			order by cnt desc
+		)v
+		where rownum between 1 and 10
+	</select>
+		
+   	<!-- 좋아요 리스트 가져오기, 검색하기 
+     <resultMap type="java.util.HashMap" id="likemap">
+		<result property="USERID" 				column="userid"  			javaType="java.lang.String"/>
+		<result property="SC_IDX" 				column="sc_idx"  			javaType="java.lang.String"/>
+		<result property="SC_NAME" 				column="sc_name"  			javaType="java.lang.String"/>
+		<result property="SC_START_DATE" 		column="sc_start_date"  	javaType="java.lang.String"/>
+		<result property="SC_END_DATE" 			column="sc_end_date"  		javaType="java.lang.String"/>
+		<result property="SC_DAYS" 				column="sc_days"  			javaType="java.lang.String"/>
+		<result property="SC_TAG" 				column="sc_tag"  			javaType="java.lang.String"/>
+		<result property="SC_LIKECOUNT" 		column="sc_likecount"  		javaType="java.lang.String"/>
+		<result property="SC_VIEWCOUNT" 		column="sc_viewcount"  		javaType="java.lang.String"/>
+	
+	</resultMap>
+   
+    <select id="getLikeList" resultMap="likemap">		
+		
+		<if test="search_id == null">
+		select a.userid as userid , a.sc_idx as sc_idx , 
+			   b.sc_name as sc_name, b.sc_start_date as sc_start_date ,b.sc_end_date as sc_end_date,
+			   b.sc_days as sc_days, b.sc_tag as sc_tag, b.sc_likecount as sc_likecount ,b.sc_viewcount as sc_viewcount
+		from tbl_like A join tbl_schedule B
+		on a.sc_idx = b.sc_idx
+		where userid = 'cde0701'
+		
+    	</if>
+    	
+    	<if test="search_id != null">
+		select a.userid, a.sc_idx, b.sc_name, b.sc_start_date,b.sc_end_date,b.sc_days,b.sc_tag,b.sc_likecount,b.sc_viewcount
+		from tbl_like A join tbl_schedule B
+		on a.sc_idx = b.sc_idx
+		where userid = 'cde0701'
+		and sc_name = 'as'
+    	</if>
+    	
+    </select>
+     -->
+    
+    
+	<!--  위시리스트에 추가하기
+	<select id="checkwishlist" resultType="Integer" parameterType="String">
+	select count(*) as cnt from wishlist where to_char(seq) = #{seq}
+	</select>
+
+	<insert id="insertwishlist"  parameterType="String"  >
+	insert into wishlist(wishlist_seq,seq) values(seqwish.nextval,#{seq})	
+	</insert>
+	 -->
+	 
+	 
+	 
+	 
+	 <!-- 친구 추가 하려고 아이디를 찾을때 ! 
+	 <resultMap type="java.util.HashMap" id="frmap">
+		<result property="USERID" 				column="userid"  			javaType="java.lang.String"/>
+		<result property="NAME" 				column="name"  			javaType="java.lang.String"/>
+		<result property="EMAIL" 				column="email"  			javaType="java.lang.String"/>
+		
+	</resultMap>
+	
+	  <select id="searchfriendtorequest" resultMap="frmap">		
+		 select userid, name, email
+		 from tbl_member
+		 where userid like '%'||#{userid}||'%'
+	 </select> -->
+
+    	<!-- 사이트 조회 -->
+	<select id="ck_today" resultType="String">
+    	select cnt 
+    	from tbl_siteInchk where to_char(indate,'yyyy-mm-dd') = to_char(sysdate,'yyyy-mm-dd')
+    </select>
+    
+    <insert id="kyu_insertvcount">
+    	insert into tbl_siteinchk(indate,cnt)
+		values(default,default)
+    </insert>
+    
+    <update id="kyu_updatevcount">
+    	update tbl_siteinchk set cnt=cnt+1
+		where to_char(indate,'yyyy-mm-dd') = to_char(sysdate,'yyyy-mm-dd')	
+    </update> 
+	
+	<select id="siteincnt" parameterType="int" resultType="String">
+		select cnt
+		from tbl_siteinchk
+		where to_char(indate,'yyyy-mm-dd') = to_char(sysdate-#{i},'yyyy-mm-dd')
+	</select>
+    
+    	<!-- //// 0629<동규> //// -->
+	<resultMap type="java.util.HashMap" id="liked">
+		<result property="IDX" 		column="sc_idx"  			javaType="java.lang.String"/>
+		<result property="NAME" 		column="sc_name"  			javaType="java.lang.String"/>
+		<result property="LIKECNT" 		column="sc_likecount"  		javaType="java.lang.String"/>
+		<result property="VIEWCNT" 		column="sc_viewcount"  		javaType="java.lang.String"/>
+	</resultMap>
+
+	<select id="getLiked" resultMap="liked">
+		select S.sc_idx as sc_idx, S.sc_name as sc_name, S.sc_likecount as sc_likecount, S.sc_viewcount as sc_viewcount
+		from tbl_like L join tbl_schedule S
+		on L.sc_idx = S.sc_idx
+		where L.userid=#{userid}
+	</select>
+	
+	<update id="addviewCnt">
+		update tbl_schedule set sc_viewcount = sc_viewcount+1
+		where sc_idx=#{sc_idx}
+	</update>
+	
+<!-- 	<update id="subtractlike">
+		update tbl_schedule set sc_likecount = sc_likecount-1
+		where sc_idx=#{idx}
+	</update>
+	
+	<delete id="deletelike">
+		delete from tbl_like
+		where sc_idx=#{idx}	 
+	</delete> -->
+	
+	<select id="getreqmemlist" resultType="com.spring.model.MemberVO" parameterType="String">
+		select *
+		from tbl_member
+		where userid in ( 
+                  select rev_id
+                  from tbl_frdreq_yn
+                  where req_id=#{curuserid} and yn =1
+                )
+	</select>
+	
+	<update id="memberEditinfo" parameterType="Hashmap">
+		update tbl_member set name=#{name}, password=#{pw}, email=#{email}, mobile=#{pnum}           
+		where userid=#{userid}
+	</update>
+	
+	<select id="reqmemberfind" parameterType="Hashmap" resultType="com.spring.model.MemberVO">
+		select userid, name, email
+		from tbl_member	
+		where userid like '%'||#{searchID}||'%' 
+		and userid not in (select id2
+		                   from tbl_friends 
+		                   where id1=#{userid}) 
+		and userid not in(#{userid})                                     
+		and userid in(select rev_id from tbl_frdreq_yn
+		                  where req_id=#{userid} and yn=1)			  
+	</select>
+    
+    	<!-- ////////////////////////////////////0702 동규 ///////////////////////////////////////////////////	/ 아래 다! -->
+	
+	<select id="deletelikechk" parameterType="HashMap" resultType="int">
+		select sc_likecount
+		from tbl_schedule
+		where sc_idx=#{idx}
+	</select>
+	
+	<update id="subtractlike" parameterType="HashMap">
+		update tbl_schedule set sc_likecount = sc_likecount-1
+		where sc_idx=#{idx}				
+	</update>
+	
+	<delete id="deletelike" parameterType="HashMap">
+		delete from tbl_like
+		where sc_idx=#{idx}	and userid=#{userid} 
+	</delete>
+	
+	
+	 <select id="addlikechk" parameterType="HashMap" resultType="String">
+    	select userid
+		from tbl_like
+		where userid=#{curuserid} and sc_idx=#{idx}			 
+    </select>
+    
+	<insert id="addlikedList" parameterType="HashMap">
+		insert into tbl_like			
+		values(#{curuserid},#{idx})
+	</insert>
+	
+	<update id="addlikecnt" parameterType="HashMap">
+		update tbl_schedule set sc_likecount=sc_likecount+1
+		where sc_idx=#{idx}
+	</update>
+    
+    
+	<resultMap type="java.util.HashMap" id="mainschedule">
+		<result property="SC_IDX" 			column="sc_idx"  					javaType="String"/>
+		<result property="SC_NAME" 			column="sc_name"  				javaType="String"/>
+		<result property="SC_LIKECOUNT" 	column="sc_likecount"  				javaType="String"/>
+		<result property="SC_VIEWCOUNT" 	column="sc_viewcount"  			javaType="String"/>
+		<result property="SC_TAG" 	column="sc_tag"  			javaType="String"/>
+		<result property="SC_CHK" 	column="chk"  			javaType="String"/>
+	</resultMap>
+					
+	<select id="getMainSchedule" resultMap="mainschedule" parameterType="HashMap">
+		select sc_idx, sc_name, sc_likecount, sc_viewcount, sc_tag
+			<if test="userid != null">
+		       , case when sc_idx in (select sc_idx from tbl_like where userid=#{userid}) then 1 else 0 end as chk
+			</if> 
+			<if test="userid == null">
+		       , case when sc_idx in (select sc_idx from tbl_like where userid is null) then 1 else 0 end as chk
+			</if>
+		from tbl_schedule
+		order by sc_idx desc
+	</select>
+	
+	<resultMap type="java.util.HashMap" id="mainscd">
+		<result property="SC_IDX" 			column="v.sc_idx"  					javaType="String"/>
+		<result property="SC_NAME" 			column="v.sc_name"  				javaType="String"/>
+		<result property="SC_LIKECOUNT" 	column="v.sc_likecount"  			javaType="String"/>
+		<result property="SC_VIEWCOUNT" 	column="v.sc_viewcount"  			javaType="String"/>
+		<result property="SC_TAG" 	column="v.sc_tag"  							javaType="String"/>
+		<result property="SC_CHK" 	column="v.chk"  							javaType="String"/>
+	</resultMap>
+	
+	<select id="k_getMainSchedule" parameterType="HashMap" resultMap="mainscd">
+		select v.sc_idx, v.sc_name, v.sc_likecount, v.sc_viewcount, v.sc_tag, v.chk
+		from
+		(
+			select row_number()over(order by sc_idx desc) as rno, sc_idx, sc_name, sc_likecount, sc_viewcount, sc_tag
+				<if test="userid != null">
+				       , case when sc_idx in (select sc_idx from tbl_like where userid = #{userid}) then 1 else 0 end as chk
+				</if>
+				<if test="userid == null">
+					   , case when sc_idx in (select sc_idx from tbl_like where userid is null) then 1 else 0 end as chk
+				</if>
+			from tbl_schedule
+		)v
+		<![CDATA[
+		where v.rno > to_number(#{pageNo})*9 and v.rno <= to_number(#{pageNo})*9+9
+		]]>	
+	</select>
+	
+    
+    <!-- ============================================================================================= -->
+    
+    <!-- ============================================ 영주  ============================================ -->
+
+	<select id="idFind" resultType="String">
+		select userid 
+		from tbl_member 
+		where name = #{name} and mobile = #{mobile}
+	</select>
+
+	<select id="pwFind" resultType="Integer">
+		select count(*) 
+		from tbl_member 
+		where userid = #{userid} and email = #{email}
+	</select>
+
+	<update id="pwChange">
+		update tbl_member set password = #{newpw}
+		where userid = #{userid}
+	</update>
+
+						<!-- 관리자 -->
+						
+	<select id="adminchk" parameterType="java.util.HashMap" resultType="int">
+		select case(select count(*) from tbl_admin where adminid=#{id} and password=#{pw})
+        when 1 then 1
+        else(case (select count(*) from tbl_admin where adminid=#{id})
+             when 1 then 0 else -1 end) end as adminck
+  		from dual
+	</select>						
+						
+	<select id="goadmin" parameterType="String" resultType="com.spring.model.AdminVO">
+		select *
+		from tbl_admin
+		where adminid=#{adminid}
+	</select>
+	
+<!-- 	
+								회원 불러오기
+								
+	<select id="adminme" resultType="com.spring.model.MemberVO">
+		select userid, idx, password, name, birth, gender, mobile, active
+		from tbl_member
+	</select>
+	 -->
+	 
+	<!-- $3 회원검색 -->
+	<select id="adminme" resultType="com.spring.model.MemberVO" parameterType="java.util.HashMap">
+		
+		select userid, idx, password, email, name,
+      	birth1,birth2,birth3,
+      	gender, mobile, active 
+		from
+		(
+		select  rownum as RNO, userid, idx, password, email, name,
+		to_char(birth,'yyyy') as birth1, to_char(birth,'mm') as birth2, 
+		to_char(birth,'dd') as birth3, gender, mobile, active 
+		from tbl_member
+		<if test="colName != null and searchWord != null">
+		where ${colName} like '%' || #{searchWord} || '%'
+		</if>
+		)v
+		<![CDATA[
+		where RNO >= #{start} and RNO <= #{end}
+		]]>
+	</select>
+	
+	<!--  $7총 회원 몇명인지 알아오기 -->
+    <select id="totalMember" resultType="int">
+    	select count(*) as totalCount 
+    	from tbl_member
+    </select>
+
+							<!-- 지역 전체 -->
+	<select id="admintr" resultType="com.spring.model.TourInfoVO">
+		select * 
+		from tbl_tourinfo
+		<if test="colName != null and searchWord != null">
+		where ${colName} like '%' || #{searchWord} || '%'
+		</if>
+	</select>
+							<!-- 관광지 추가 -->	 
+    <insert id="trinst">
+    	insert into tbl_tourinfo 
+    	values(seq_tidx.nextval, to_number(#{de_area_code}), #{t_name}, #{t_addr}, to_number(#{t_type}), 0,
+    	<if test="t_start_date != null and t_end_date != null">
+	    	<if test="t_type == 2 or t_type == 3">to_date(#{t_start_date},'hh24:mi'), to_date(#{t_end_date},'hh24:mi'),</if>
+	    	<if test="t_type != 2 and t_type != 3">to_date(#{t_start_date},'yyyy-mm-dd'), to_date(#{t_end_date},'yyyy-mm-dd'),</if>
+    	</if>
+    	#{t_detail}, to_number(#{tx}), to_number(#{ty}), 0)
+    </insert>
+    
+    <select id="getTrinstIdx" resultType="Integer">
+    	select seq_tidx.currval from dual
+    </select>
+
+
+	<!-- insert into tbl_tourinfo values(#{t_idx}, #{de_area_code}, #{t_name}, #{t_addr}, #{t_type}, #{t_start_date}, #{t_end_date}, #{t_image1}, #{t_image2}, #{t_detail}, #{tx}, #{ty}, ) -->
+ 
+     <!-- (t_idx, de_area_code, t_name, t_addr, t_type, t_start_date, t_end_date, t_image1, t_image2, t_detail, tx, ty) -->
+     <!-- 
+     insert into tbl_tourinfo 
+    	values(seq_tidx.nextval, #{de_area_code}, #{t_name}, #{t_addr}, #{t_type}, 
+    	<if test="t_type == 2 or t_type == 3">to_date(#{t_start_date},'hh24:mi'), to_date(#{t_end_date},'hh24:mi'),</if>
+    	<if test="t_type != 2 and t_type != 3">to_date(#{t_start_date},'yyyy-mm-dd'), to_date(#{t_end_date},'yyyy-mm-dd'),</if>
+    	#{t_image1}, #{t_image2}, #{t_detail}, #{tx}, #{ty} ) -->
+     
+     							<!-- 관광지 제거 -->
+     <delete id="deltour" parameterType="HashMap">
+		delete from tbl_tourinfo
+		where t_idx = #{t_idx}
+	</delete>
+	
+								<!-- 관광지 수정 -->
+	<update id="adminedittr" parameterType="java.util.HashMap">
+    	update tbl_tourinfo set de_area_code = #{de_area_code}, t_name = #{t_name}, t_addr = #{t_addr}, t_type = #{t_type}, 
+    							<if test="t_type == 2 or t_type == 3">t_start_date = to_date(#{t_start_date},'hh24:mi'), t_end_date = to_date(#{t_end_date},'hh24:mi'),</if>
+    							<if test="t_type != 2 and t_type != 3">t_start_date = to_date(#{t_start_date},'hh24:mi'), t_end_date = to_date(#{t_end_date},'hh24:mi'),</if>
+    							t_detail = #{t_detail}, tx = #{tx}, ty = #{ty}
+    	where userid = #{userid}
+    </update>
+    
+    
+    							<!-- 관광지 지역 가져오기 -->
+    <select id="tacode" resultType="com.spring.model.AreaVO">
+    	select * 
+    	from tbl_area
+    </select>
+    
+    <select id="tdacode" resultType="com.spring.model.AreaDetailVO" parameterType="String">
+    	select * 
+    	from tbl_area_detail
+    	where area_code = #{area_code}
+    </select>
+    
+         <!-- 광광지 페이징 처리 -->
+     <select id="tsearch" resultType="com.spring.model.TourInfoVO" parameterType="java.util.HashMap"> 
+		select t_idx, t_name, de_area_code, t_addr
+		from
+		(
+		select row_number()over(order by t_idx desc) as RNO 
+		     , t_idx
+		     , t_name
+		     , de_area_code
+		     , t_addr
+		from tbl_tourinfo
+		where ${column} like '%' || #{search} || '%'
+		) V
+		<![CDATA[
+		where RNO >= #{start} and RNO <= #{end}
+		]]>
+     </select> 
+     
+     
+     
+     
+    <!-- 관광지 리스트 --> 
+     <select id="tlist" resultType="com.spring.model.TourInfoVO" parameterType="java.util.HashMap">
+		select t_idx, t_type, t_name, de_area_code, t_addr
+		from
+		(
+		select row_number()over(order by t_idx desc) as RNO 
+		     , t_idx
+		     , t_type
+		     , t_name
+		     , de_area_code
+		     , t_addr
+		from tbl_tourinfo
+		) V
+		<![CDATA[
+		where RNO >= #{start} and RNO <= #{end}
+		]]>
+	</select> 
+	
+     
+      
+     
+    <!-- 총 관광지 수 --> 
+     <select id="getTotalCountTour" resultType="int">
+    	select count(*) as totalCount 
+    	from tbl_tourinfo
+    </select>
+ 
+     
+    <!-- 관광지 검색 -->
+    <select id="getSearchCountTour" resultType="int" parameterType="java.util.HashMap"> 
+    	select count(*) as totalCount 
+    	from tbl_tourinfo
+    	where ${column} like '%' || #{search} || '%'
+    </select>
+     
+     
+     
+     
+     
+      
+     <!-- 페이징 처리 ㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇ 회원 -->
+     
+     
+     <!-- 회원 검색 페이징 -->
+     <select id="msearch" resultType="com.spring.model.MemberVO" parameterType="java.util.HashMap"> 
+	select userid, idx, password, email, name, birth1, birth2, birth3, gender, mobile, active 
+		from
+		(
+		select row_number()over(order by idx desc) as RNO
+       		 , userid
+       		 , idx
+       		 , password
+       		 , email
+       		 , name
+       		 , to_char(birth,'yyyy') as birth1
+       		 , to_char(birth,'mm') as birth2
+       		 , to_char(birth,'dd') as birth3
+       		 , gender
+       		 , mobile
+       		 , active 
+		from tbl_member
+		) V
+		<![CDATA[
+		where RNO >= #{start} and RNO <= #{end}
+		]]>
+     </select> 
+     
+     
+     
+     
+     <!-- 회원 리스트 -->
+     <select id="mlist" resultType="com.spring.model.MemberVO" parameterType="java.util.HashMap">
+	select userid, idx, password, email, name, birth1, birth2, birth3, gender, mobile, active 
+		from
+		(
+		select row_number()over(order by idx desc) as RNO
+       		 , userid
+       		 , idx
+       		 , password
+       		 , email
+       		 , name
+       		 , to_char(birth,'yyyy') as birth1
+       		 , to_char(birth,'mm') as birth2
+       		 , to_char(birth,'dd') as birth3
+       		 , gender
+       		 , mobile
+       		 , active 
+		from tbl_member
+		) V
+		<![CDATA[
+		where RNO >= #{start} and RNO <= #{end}
+		]]>
+	</select> 
+	
+     
+      
+     
+     <!-- 총 회원 수 -->
+     <select id="getTotalCountMember" resultType="int">
+    	select count(*) as totalCount 
+    	from tbl_member
+    </select>
+ 
+     
+    <!-- 회원검색 -->
+    <select id="getSearchCountMember" resultType="int" parameterType="java.util.HashMap"> 
+    	select count(*) as totalCount 
+    	from tbl_member
+    	where ${column} like '%' || #{search} || '%'
+    </select>
+          
+     
+     
+     
+     <!-- 관광지룰 수정해보자ㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇ -->
+     
+     	<!-- 지역정보 -->
+     <select id="gettourcnginfo" parameterType="java.util.HashMap" resultType="com.spring.model.TourInfoVO">
+		select *
+		from tbl_tourinfo
+		where to_char(t_idx) = #{t_idx}
+	</select>
+     
+    	<!-- 지역상세코드 -->
+ 
+	<select id="getadinfo" resultType="com.spring.model.AreaDetailVO">
+    	select * 
+    	from tbl_area_detail
+    </select>
+	
+
+	<select id="areadetail" parameterType="java.util.HashMap" resultType="com.spring.model.AreaDetailVO">
+		select * 
+    	from tbl_area_detail
+		where area_code = #{t_idx}
+	</select>
+    
+
+    
+    <!-- ============================================================================================= -->
+
+
+    <!-- ============================================ 대은  ============================================ -->
+
+    <!-- 상태 메시지 바꾸는 메소드 !!  -->
+    <update id="updateStatus" parameterType="java.util.HashMap">
+    	update tbl_statusmsg set statusmsg = #{statusmsg} where userid = #{userid}
+    </update>
+   
+	<!-- 상태 메시지를 가져오는 쿼리  -->
+	<select id="getstatusmsg" parameterType="String" resultType="String" >
+			select statusmsg from tbl_statusmsg where userid = #{userid} 
+	</select>
+
+	<!-- 위시리스트를 가져오는 쿼리(검색 포함)  -->
+	 <resultMap type="java.util.HashMap" id="wishmap">
+		<result property="USERID" 			column="userid"  			javaType="java.lang.String"/>
+		<result property="T_IDX" 			column="t_idx"  			javaType="java.lang.String"/>
+		<result property="T_NAME" 			column="t_name"  			javaType="java.lang.String"/>
+		<result property="T_ADDR" 			column="t_addr"  			javaType="java.lang.String"/>
+		<result property="T_RATING" 		column="t_rating"  			javaType="java.lang.String"/>
+		<result property="T_DETAIL" 		column="t_detail"  			javaType="java.lang.String"/>
+		<result property="DE_AREA_CODE" 	column="de_area_code"  		javaType="java.lang.String"/>	
+	</resultMap>
+    
+    <select id="getwishlist" resultMap="wishmap">		
+		<if test="t_name == null">
+		select userid ,  t.t_idx as t_idx,  t.t_name as t_name , t.t_addr as t_addr , round(t.t_rating,1) as t_rating, 
+	   	t.t_detail as t_detail , t.de_area_code as t_de_area_code
+	   	from tbl_wishlist W join tbl_tourinfo T
+		on W.t_idx = T.t_idx 
+		where userid = #{userid}
+		</if>
+		
+		<if test="t_name != null">
+		select userid ,  t.t_idx as t_idx,  t.t_name as t_name , t.t_addr as t_addr , round(t.t_rating,1) as t_rating, 
+	   	t.t_detail as t_detail , t.de_area_code as t_de_area_code
+	   	from tbl_wishlist W join tbl_tourinfo T
+		on W.t_idx = T.t_idx 
+		where 1=1
+		and userid = #{userid}
+		and t_name like '%' || #{t_name} || '%' 
+		</if>
+    </select>
+  
+    
+    <!-- 위시리스트를 지우는 쿼리 -->
+    <delete id="deletewishlist" parameterType="java.util.HashMap">
+    	delete from tbl_wishlist where 1 = 0
+    	<foreach collection="list"  item="item" index="index" >
+            or (userid=#{userid[0]} and t_idx = #{item})
+         </foreach>
+    </delete>
+   
+   
+   
+   <!-- 친구 리스트를 가져오는 쿼리 (검색 포함)  --> 
+   <resultMap type="java.util.HashMap" id="friendmap">
+		<result property="ID1" 				column="id1"  			javaType="java.lang.String"/>
+		<result property="USERID" 			column="id2"  			javaType="java.lang.String"/>
+		<result property="NAME" 			column="name"  			javaType="java.lang.String"/>
+		<result property="EMAIL" 			column="email"  		javaType="java.lang.String"/>
+	</resultMap>
+    <select id="getFriendsList" resultMap="friendmap">		
+	
+		<if test="search_id == null">
+		select  a.id1 as id1 ,A.id2 as id2 , B.name as name , b.email as email
+		from tbl_friends A join tbl_member B
+		on a.id2 = b.userid
+		where a.id1 = #{userid}
+		</if>
+		
+		<if test="search_id != null">
+		select  a.id1 as id1 ,A.id2 as id2 , B.name as name , b.email as email
+		from tbl_friends A join tbl_member B
+		on a.id2 = b.userid
+		where 
+		id1 = #{userid} and
+		id2 like '%' || #{search_id} || '%'
+		</if>
+
+    </select>
+   
+   <!-- 친구를 userid 를 통해서 찾아서 친구 추가를 한다   -->
+   <resultMap type="java.util.HashMap" id="findfriend">
+   
+		<result property="ID1" 				column="id1"  			javaType="java.lang.String"/>
+		<result property="USERID" 			column="id2"  			javaType="java.lang.String"/>
+		<result property="NAME" 			column="name"  			javaType="java.lang.String"/>
+		<result property="EMAIL" 			column="email"  		javaType="java.lang.String"/>
+	
+	</resultMap>
+   
+  <select id="findFriend" resultMap="findfriend">		
+		
+		select  a.id1 as id1 ,A.id2 as id2 , B.name as name , b.email as email
+		from tbl_friends A join tbl_member B
+		on a.id2 = b.userid
+		where 
+		id1 = #{userid} and
+		id2 like '%'||#{search_id}||'%'
+
+    </select>
+    
+    
+    
+  <!-- 위시리스트 지역별로 알아오기 --> 
+     <resultMap type="java.util.HashMap" id="wishRegionMap">
+   
+		<result property="USERID" 			column="userid"  			javaType="java.lang.String"/>
+		<result property="AREA_CODE" 		column="area_code"  		javaType="java.lang.String"/>
+		<result property="T_IDX" 			column="t_idx"  			javaType="java.lang.String"/>
+		<result property="T_NAME" 			column="t_name"  			javaType="java.lang.String"/>
+		<result property="T_ADDR" 			column="t_addr"  			javaType="java.lang.String"/>
+		<result property="T_RATING" 		column="t_rating"  			javaType="java.lang.String"/>
+		<result property="DE_AREA_CODE" 	column="de_area_code"  		javaType="java.lang.String"/>
+		<result property="T_TYPE" 			column="t_type"  			javaType="java.lang.String"/>
+		<result property="TX" 				column="tx"  				javaType="java.lang.String"/>
+		<result property="TY" 				column="ty"  				javaType="java.lang.String"/>
+		
+	</resultMap>
+   
+     <select id="getWishRegion"  resultMap="wishRegionMap">
+  
+		select W.userid as userid 
+		  ,D.area_code as area_code 
+		  ,W.t_idx as t_idx
+		  ,T.t_name as t_name
+		  ,T.t_addr as t_addr
+		  ,round(T.t_rating,1) as t_rating
+		  ,T.t_detail as t_detail
+		  ,T.de_area_code as de_area_code
+		  ,T.t_type as t_type
+		  ,T.tx as tx
+		  ,T.ty as ty
+		from tbl_area_detail D join tbl_tourinfo T
+		on D.de_area_code = T.de_area_code
+		join tbl_wishlist W
+		on T.t_idx = W.t_idx
+		where userid = #{userid}
+		<if test=" areano != 0">
+		and area_code = #{areano}
+		</if>
+	
+	</select>
+			
+			
+			
+	<!-- 위시리스트 지역별로 알아오기  (검색)--> 
+     <resultMap type="java.util.HashMap" id="wishRegionMap2">
+   
+		<result property="USERID" 			column="userid"  			javaType="java.lang.String"/>
+		<result property="AREA_CODE" 		column="area_code"  		javaType="java.lang.String"/>
+		<result property="T_IDX" 			column="t_idx"  			javaType="java.lang.String"/>
+		<result property="T_NAME" 			column="t_name"  			javaType="java.lang.String"/>
+		<result property="T_ADDR" 			column="t_addr"  			javaType="java.lang.String"/>
+		<result property="T_RATING" 		column="t_rating"  			javaType="java.lang.String"/>
+		<result property="DE_AREA_CODE" 	column="de_area_code"  		javaType="java.lang.String"/>
+		
+	</resultMap>
+   
+    <select id="getWishRegionSearch"  resultMap="wishRegionMap2">
+    <if test=" areano == 0"> 
+			select W.userid as userid 
+			  ,D.area_code as area_code 
+			  ,W.t_idx as t_idx
+			  ,T.t_name as t_name
+			  ,T.t_addr as t_addr
+			  ,T.t_rating as t_rating
+			  ,T.t_detail as t_detail
+			  ,T.de_area_code as de_area_code
+			from tbl_area_detail D join tbl_tourinfo T
+			on D.de_area_code = T.de_area_code
+			join tbl_wishlist W
+			on T.t_idx = W.t_idx
+			where userid = #{userid}
+			and t_name like '%' || #{searchword} || '%' 
+	
+	</if>
+	
+	 <if test=" areano != 0">
+	    
+			select W.userid as userid 
+			  ,D.area_code as area_code 
+			  ,W.t_idx as t_idx
+			  ,T.t_name as t_name
+			  ,T.t_addr as t_addr
+			  ,T.t_rating as t_rating
+			  ,T.t_detail as t_detail
+			  ,T.de_area_code as de_area_code
+			from tbl_area_detail D join tbl_tourinfo T
+			on D.de_area_code = T.de_area_code
+			join tbl_wishlist W
+			on T.t_idx = W.t_idx
+			where userid = #{userid}
+			and area_code = #{areano}
+			and t_name like '%' || #{searchword} || '%' 
+	     
+	    </if>
+	</select>		
+
+    
+   	<!-- 좋아요 리스트 가져오기, 검색하기 
+     <resultMap type="java.util.HashMap" id="likemap">
+		<result property="USERID" 				column="userid"  			javaType="java.lang.String"/>
+		<result property="SC_IDX" 				column="sc_idx"  			javaType="java.lang.String"/>
+		<result property="SC_NAME" 				column="sc_name"  			javaType="java.lang.String"/>
+		<result property="SC_START_DATE" 		column="sc_start_date"  	javaType="java.lang.String"/>
+		<result property="SC_END_DATE" 			column="sc_end_date"  		javaType="java.lang.String"/>
+		<result property="SC_DAYS" 				column="sc_days"  			javaType="java.lang.String"/>
+		<result property="SC_TAG" 				column="sc_tag"  			javaType="java.lang.String"/>
+		<result property="SC_LIKECOUNT" 		column="sc_likecount"  		javaType="java.lang.String"/>
+		<result property="SC_VIEWCOUNT" 		column="sc_viewcount"  		javaType="java.lang.String"/>
+	
+	</resultMap>
+   
+    <select id="getLikeList" resultMap="likemap">		
+		
+		<if test="search_id == null">
+		select a.userid as userid , a.sc_idx as sc_idx , 
+			   b.sc_name as sc_name, b.sc_start_date as sc_start_date ,b.sc_end_date as sc_end_date,
+			   b.sc_days as sc_days, b.sc_tag as sc_tag, b.sc_likecount as sc_likecount ,b.sc_viewcount as sc_viewcount
+		from tbl_like A join tbl_schedule B
+		on a.sc_idx = b.sc_idx
+		where userid = 'cde0701'
+		
+    	</if>
+    	
+    	<if test="search_id != null">
+		select a.userid, a.sc_idx, b.sc_name, b.sc_start_date,b.sc_end_date,b.sc_days,b.sc_tag,b.sc_likecount,b.sc_viewcount
+		from tbl_like A join tbl_schedule B
+		on a.sc_idx = b.sc_idx
+		where userid = 'cde0701'
+		and sc_name = 'as'
+    	</if>
+    	
+    </select>
+     -->
+    
+    
+    <!-- 위시리스트에 벌써 추가가 되어있나 없나 확인하ㅣ  -->
+    <select id="checkWishList" resultType="Integer" >
+	select count(*) as cnt from tbl_wishlist where userid = #{userid} and 
+	t_idx = #{t_idx}
+	</select>
+    
+    
+    
+    <!-- 관광지 상세 정보에서 위시리스트 추가하기  -->
+	<insert id="insertWL" parameterType="java.util.HashMap" >
+	insert into tbl_wishlist values(#{userid},#{t_idx})
+	</insert>
+
+    <!-- 관광지 상세 정보에서 위시리스트 제거하기  -->
+	<delete id="deleteWL" parameterType="java.util.HashMap" >
+	delete tbl_wishlist where userid = #{userid} and t_idx = #{t_idx}
+	</delete>
+	
+	 
+	<!-- 위시리스트를 지우는 쿼리 -->	 
+	<delete id="delWish">
+			delete from tbl_wishlist where userid = #{userid} and t_idx = #{t_idx}
+	</delete>
+
+	
+	<!-- 위시리스트를 지우는 쿼리 -->
+    <delete id="deleteWishList">
+    	delete from tbl_wishlist where 1 = 0
+    	<foreach collection="chkbox"  item="item" index="index" >
+            or (userid=#{userid[0]} and t_idx = #{item})
+        </foreach>
+    </delete>
+  
+  
+	<!-- 검색한 거 다 넣어버리는 것 !!!   -->
+    <insert id="insertSearchedWords" parameterType="java.util.HashMap" >
+	
+	<if test="userid == null">
+	insert into tbl_searchedWords (sw_idx,userid,searchedWord,insertDate) values(seq_sw.nextval, null, #{area1}, default)
+	</if>
+	
+	<if test="userid != null">
+	insert into tbl_searchedWords (sw_idx,userid,searchedWord,insertDate) values(seq_sw.nextval, #{userid}, #{area1}, default)
+	</if>
+	
+	</insert>
+	
+	
+	 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 대은 어드민 부분 시작  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  --> 
+	 <!-- 댓글 많이 단거 가져온다  -->
+	   	<resultMap type="java.util.HashMap" id="commentRank">
+		<result property="RANK" 			column="rank"  				javaType="String"/>
+		<result property="NAME" 			column="name"  				javaType="String"/>
+		<result property="COMMENTCOUNT" 	column="commentCount"  		javaType="Integer"/>
+		</resultMap>
+	   
+	    <select id="getTourCommentRank"  resultMap="commentRank" >
+		
+		select v.rank as rank, v.t_name as name, v.commentCount as commentCount
+		from
+		(  
+		SELECT Dense_RANK() OVER (ORDER BY commentCount DESC) as RANK,t_name, commentCount,t_idx
+		FROM tbl_tourinfo
+		)v 
+		
+		<![CDATA[
+		where v.RANK <= 5
+		]]> 
+		
+		</select>
+		
+		
+		
+		<!-- 관광지 검색 많이 한거 순으로 가져온다  -->
+	   	<resultMap type="java.util.HashMap" id="regionRank">
+		<result property="RANK" 			column="rank"  				javaType="String"/>
+		<result property="searchedWord" 	column="searchedWord"  		javaType="String"/>
+		<result property="COUNT" 			column="count"  			javaType="String"/>
+		</resultMap>
+	   
+	    <select id="getRegionRank"  resultMap="regionRank" >
+		
+		
+		
+		select d.rank as rank, d.searchedWord as searchedWord,
+		d.insertDate as insertDate ,d.count as count
+		from
+		(
+		select dense_rank() over(order by count desc) as rank, m.searchedWord as searchedWord,
+		m.insertDate as insertDate ,m.count as count
+		from
+		(
+		select count(*) as count,v.searchedWord as searchedWord ,v.insertDate as insertDate from
+		(
+		
+		<if test="dateReq != null and month == null">
+		select searchedWord, to_char(insertDate,'yyyy-mm-dd') as insertDate
+		from tbl_searchedWords where to_char(insertDate,'yyyy-mm-dd') = #{dateReq}
+		</if>
+		
+		<if test="dateReq == null and month != null">
+		select searchedWord, to_char(insertDate,'yyyy-mm') as insertDate
+		from tbl_searchedWords where to_char(insertDate,'yyyy-mm') = #{month}
+		</if>
+		
+		)v
+		group by v.searchedWord, v.insertDate
+		)m
+		)d 
+		
+		<![CDATA[
+		where d.RANK <= 5 
+		]]> 		
+
+		</select> 
+		
+		<!-- 연령대, 나이 가져오기   -->
+	 	<resultMap type="java.util.HashMap" id="AGERank">
+		<result property="AGELINE" 			column="ageline"  				javaType="String"/>
+		<result property="COUNT" 			column="count"  				javaType="String"/>
+		<result property="MAN" 				column="man"  					javaType="String"/>
+		<result property="WOMAN" 			column="woman"  				javaType="String"/>
+		
+		</resultMap>
+	   
+	    <select id="getAdmin_ageStat"  resultMap="AGERank" >
+		
+			select ageline, count
+			,(select count(*) from view_total_age where gender = '남' and ageline = v.ageline) as man
+			,(select count(*) from view_total_age where gender = '여' and ageline = v.ageline) as woman
+			from
+			(
+			select ageline, count(*) as count
+			from view_total_age
+			group by ageline
+			)v
+			ORDER BY AGELINE
+		</select>
+		
+		
+		
+		<!-- 하루 검색어 순위  -->
+	   	<resultMap type="java.util.HashMap" id="regionRankDaily">
+		<result property="RANKING" 			column="rank"  				javaType="INTEGER"/>
+		<result property="searchedWord" 	column="searchedWord"  		javaType="String"/>
+		<result property="COUNT" 			column="count"  			javaType="String"/>
+		</resultMap>
+	   
+	    <select id="admin_regionRankDaily"  resultMap="regionRankDaily" >
+		
+		select d.rank as rank, d.searchedWord as searchedWord,
+		d.insertDate as insertDate ,d.count as count
+		from
+		(
+		select dense_rank() over(order by count desc) as rank, m.searchedWord as searchedWord,
+		m.insertDate as insertDate ,m.count as count
+		from
+		(
+		select count(*) as count,v.searchedWord as searchedWord ,v.insertDate as insertDate from
+		(
+		select searchedWord, to_char(insertDate,'yyyy-mm-dd') as insertDate
+		from tbl_searchedWords where to_char(insertDate,'yyyy-mm-dd') = to_char(sysdate,'yyyy-mm-dd')
+		)v
+		group by v.searchedWord, v.insertDate
+		)m
+		)d 
+		
+		<![CDATA[
+		where d.RANK <= 5 
+		]]> 		
+
+		</select> 
+
+
+
+		<!-- 월 검색어 순위  -->
+	   	<resultMap type="java.util.HashMap" id="regionRankMonthly">
+		<result property="RANKING" 			column="rank"  				javaType="INTEGER"/>
+		<result property="searchedWord" 	column="searchedWord"  		javaType="String"/>
+		<result property="COUNT" 			column="count"  			javaType="String"/>
+		</resultMap>
+	   
+	    <select id="admin_regionRankMonthly"  resultMap="regionRankMonthly" >
+		
+		select d.rank as rank, d.searchedWord as searchedWord,
+		d.insertDate as insertDate ,d.count as count
+		from
+		(
+		select dense_rank() over(order by count desc) as rank, m.searchedWord as searchedWord,
+		m.insertDate as insertDate ,m.count as count
+		from
+		(
+		select count(*) as count,v.searchedWord as searchedWord ,v.insertDate as insertDate from
+		(
+		select searchedWord, to_char(insertDate,'yyyy-mm') as insertDate
+		from tbl_searchedWords where to_char(insertDate,'yyyy-mm') = to_char(sysdate,'yyyy-mm')
+		)v
+		group by v.searchedWord, v.insertDate
+		)m
+		)d 
+		
+		<![CDATA[
+		where d.RANK <= 5 
+		]]> 		
+
+		</select> 
+		
+		
+		<!-- 서울 별점 부분 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 시작   !!!주말!!!  -->
+		
+		<!-- 관광지  -->
+		<resultMap type="java.util.HashMap" id="aa">
+		<result property="NAME" 			column="name"  					javaType="String"/>
+		<result property="RATING" 			column="rating"  				javaType="String"/>
+		<result property="RANKING" 			column="ranking"  				javaType="String"/>
+		
+		</resultMap>
+	   
+	    <select id="seoulTourRating"  resultMap="aa" >
+		
+		select a.t_name as name, dense_rank() over(order by round(a.t_rating,1) desc) as ranking,  round(a.t_rating,1)as rating 
+		from tbl_tourinfo A join tbl_area_detail B
+		on a.de_area_code = b.de_area_code
+		where 1 = 1  
+		<if test="no==100">
+		and area_code = 1 and t_type =1
+		</if>
+		
+		<if test="no==2">
+		and area_code = #{no} and t_type =1
+		</if>
+		
+		<if test="no==3">
+		and area_code = #{no} and t_type =1
+		</if>
+		
+		<if test="no==4">
+		and  area_code = #{no} and t_type =1
+		</if>
+		
+		<if test="no==5">
+		and area_code = #{no} and t_type =1
+		</if>
+		
+		<if test="no==6">
+		and  area_code = #{no} and t_type =1
+		</if>
+		
+		<if test="no==7">
+		and area_code = #{no} and t_type =1
+		</if>
+		
+		<if test="no==8">
+		and area_code = #{no} and t_type =1
+		</if>
+		
+		<if test="no==9">
+		and area_code = #{no} and t_type =1
+		</if>
+		
+		</select>
+		
+		<!-- 음식점  -->	
+		<resultMap type="java.util.HashMap" id="bb">
+		<result property="NAME" 			column="name"  					javaType="String"/>
+		<result property="RATING" 			column="rating"  				javaType="String"/>
+		<result property="RANKING" 			column="ranking"  				javaType="String"/>
+		
+		</resultMap>
+	   
+	    <select id="seoulFoodRating"  resultMap="bb" >
+		
+		select a.t_name as name, dense_rank() over(order by round(a.t_rating,1) desc) as ranking,  round(a.t_rating,1)as rating 
+		from tbl_tourinfo A join tbl_area_detail B
+		on a.de_area_code = b.de_area_code
+		where 1 = 1 
+		<if test="no==100">
+		and area_code = 1 and t_type = 2
+		</if>
+		
+		<if test="no==2">
+		and area_code = #{no} and t_type =2
+		</if>
+		
+		<if test="no==3">
+		and area_code = #{no} and t_type =2
+		</if>
+		
+		<if test="no==4">
+		and area_code = #{no} and t_type =2
+		</if>
+		
+		<if test="no==5">
+		and area_code = #{no} and t_type =2
+		</if>
+		
+		<if test="no==6">
+		and area_code = #{no} and t_type =2
+		</if>
+		
+		<if test="no==7">
+		and area_code = #{no} and t_type =2
+		</if>
+		
+		<if test="no==8">
+		and area_code = #{no} and t_type =2
+		</if>
+		
+		<if test="no==9">
+		and area_code = #{no} and t_type =2
+		</if>
+		</select>
+		
+		
+		<!-- 숙박  -->	
+		<resultMap type="java.util.HashMap" id="cc">
+		<result property="NAME" 			column="name"  					javaType="String"/>
+		<result property="RATING" 			column="rating"  				javaType="String"/>
+		<result property="RANKING" 			column="ranking"  				javaType="String"/>
+		
+		</resultMap>
+	   
+	    <select id="seoulHotelRating"  resultMap="cc" >
+		
+		select a.t_name as name, dense_rank() over(order by round(a.t_rating,1) desc) as ranking,  round(a.t_rating,1)as rating 
+		from tbl_tourinfo A join tbl_area_detail B
+		on a.de_area_code = b.de_area_code
+		where 1=1
+		<if test="no==100">
+		and area_code = 1 and t_type = 3
+		</if>
+		
+		<if test="no==2">
+		and area_code = #{no} and t_type =3
+		</if>
+		
+		<if test="no==3">
+		and area_code = #{no} and t_type =3
+		</if>
+		
+		<if test="no==4">
+		and area_code = #{no} and t_type =3
+		</if>
+		
+		<if test="no==5">
+		and area_code = #{no} and t_type =3
+		</if>
+		
+		<if test="no==6">
+		and area_code = #{no} and t_type =3
+		</if>
+		
+		<if test="no==7">
+		and area_code = #{no} and t_type =3
+		</if>
+		
+		<if test="no==8">
+		and area_code = #{no} and t_type =3
+		</if>
+		
+		<if test="no==9">
+		and area_code = #{no} and t_type =3
+		</if>
+		</select>
+		
+		
+		
+		<!-- 체험  -->	
+		<resultMap type="java.util.HashMap" id="dd">
+		<result property="NAME" 			column="name"  					javaType="String"/>
+		<result property="RATING" 			column="rating"  				javaType="String"/>
+		<result property="RANKING" 			column="ranking"  				javaType="String"/>
+		</resultMap>
+	   
+	    <select id="seoulOtherRating"  resultMap="dd" >
+		
+		select a.t_name as name, dense_rank() over(order by round(a.t_rating,1) desc) as ranking,  round(a.t_rating,1)as rating 
+		from tbl_tourinfo A join tbl_area_detail B
+		on a.de_area_code = b.de_area_code
+		where 1=1 
+		<if test="no==100">
+		and area_code = 1 and t_type = 4
+		</if>
+		
+		<if test="no==2">
+		and area_code = #{no} and t_type =4
+		</if>
+		
+		<if test="no==3">
+		and area_code = #{no} and t_type =4
+		</if>
+		
+		<if test="no==4">
+		and area_code = #{no} and t_type =4
+		</if>
+		
+		<if test="no==5">
+		and area_code = #{no} and t_type =4
+		</if>
+		
+		<if test="no==6">
+		and area_code = #{no} and t_type =4
+		</if>
+		
+		<if test="no==7">
+		and area_code = #{no} and t_type =4
+		</if>
+		
+		<if test="no==8">
+		and area_code = #{no} and t_type =4
+		</if>
+		
+		<if test="no==9">
+		and area_code = #{no} and t_type =4
+		</if>
+		</select>
+
+		<!-- 서울 별점 부분 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 끝   -->
+
+		
+		<!-- 좋아요 순위  -->	
+		<resultMap type="java.util.HashMap" id="ee">
+		<result property="RANK" 			column="rank"  					javaType="String"/>
+		<result property="SC_IDX" 			column="sc_idx"  				javaType="String"/>
+		<result property="SC_NAME" 			column="sc_name"  				javaType="String"/>
+		<result property="SC_LIKECOUNT" 	column="sc_likecount"  			javaType="String"/>
+		
+		</resultMap>
+	   
+	    <select id="getLikeRank"  resultMap="ee" >
+	
+		select v.rank as rank , v.sc_idx as sc_idx , v.sc_name as sc_name ,v.sc_likecount as sc_likecount from 
+		(
+		select dense_rank() over (order by  sc_likecount desc) as rank
+		, sc_idx, sc_name,sc_likecount  from TBL_SCHEDULE
+		)v
+		<![CDATA[
+		where v.rank <= 5
+		]]>
+		
+		</select>
+		
+		<!-- 스케줄 조회  순위  -->	
+		<resultMap type="java.util.HashMap" id="ff">
+		<result property="RANK" 			column="rank"  					javaType="String"/>
+		<result property="SC_IDX" 			column="sc_idx"  				javaType="String"/>
+		<result property="SC_NAME" 			column="sc_name"  				javaType="String"/>
+		<result property="SC_VIEWCOUNT" 	column="sc_viewcount"  			javaType="String"/>
+		
+		</resultMap>
+	   
+	    <select id="getviewRankSC"  resultMap="ff" >
+	
+		select v.rank as rank , v.sc_idx as sc_idx , v.sc_name as sc_name ,  v.sc_viewcount as sc_viewcount from
+		(
+		select dense_rank() over (order by  sc_viewcount desc) as rank
+		, sc_idx, sc_name,sc_viewcount  from TBL_SCHEDULE
+		)v
+		<![CDATA[
+		where v.rank <= 5
+		
+		]]>
+		
+		</select>
+				
+		
+
+	 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 대은 어드민 부분 끝  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  -->
+	  
+
+    	<!-- // 검색한 스케쥴만 가져오기 ( my_plan 에서 !!) -->
+	<select id="getMySearchedSchedule" resultType="com.spring.model.ScheduleVO" >
+			select s.sc_idx, sc_name, to_char(sc_start_date,'yyyy-mm-dd') as sc_start_date, to_char(sc_end_date,'yyyy-mm-dd') as sc_end_date, sc_days, sc_tag, sc_likecount, sc_viewcount
+			from tbl_schedule s
+			join tbl_join j
+			on s.sc_idx = j.sc_idx
+			<if test="userid != null">
+			where userid = #{userid}
+			and sc_name like '%' || #{search} || '%'
+			order by sc_idx desc
+			</if>
+		</select>
+    
+    <!-- 좋아요 검색 -->
+	    <resultMap type="java.util.HashMap" id="searchliked">
+			<result property="IDX" 			column="sc_idx"  			javaType="java.lang.String"/>
+			<result property="NAME" 		column="sc_name"  			javaType="java.lang.String"/>
+			<result property="LIKECNT" 		column="sc_likecount"  		javaType="java.lang.String"/>
+			<result property="VIEWCNT" 		column="sc_viewcount"  		javaType="java.lang.String"/>
+		</resultMap>
+	
+		<select id="getSearchedLiked" resultMap="searchliked">
+			select S.sc_idx as sc_idx, S.sc_name as sc_name, S.sc_likecount as sc_likecount, S.sc_viewcount as sc_viewcount
+			from tbl_like L join tbl_schedule S
+			on L.sc_idx = S.sc_idx
+			where L.userid=#{userid}
+			and S.sc_name like '%' || #{searched} || '%'
+		</select>
+		
+		    <!-- paige --> 
+    <resultMap type="java.util.HashMap" id="friendmap2">
+		<result property="FRIEND" 			column="friend"  			javaType="java.lang.String"/>
+		<result property="ME" 				column="me"  				javaType="java.lang.String"/>
+		
+	</resultMap>
+    <select id="friendlistPaige" resultMap="friendmap2">		
+	
+	   select id2 as friend, id1 as me from TBL_FRIENDS where id1= #{userid}
+
+    </select>
+    
+          
+ 	<!-- paige --> 
+	<insert id="addInvite" parameterType="java.util.HashMap"  > 
+		insert into TBL_INVITE(myuserid,sc_idx,userid) values (#{userid},#{sc_idx},#{friendid})
+	</insert>
+	
+	
+	<!-- paige --> 
+	<resultMap type="java.util.HashMap" id="request">
+		<result property="IDX" 			column="sc_idx"  			javaType="java.lang.String"/>
+		<result property="NAME" 		column="sc_name"  			javaType="java.lang.String"/>
+		<result property="USERID" 		column="userid"  			javaType="java.lang.String"/>
+		<result property="MYUSERID" 	column="myuserid"  			javaType="java.lang.String"/>
+	</resultMap>
+
+	<select id="getRequestedInvite" resultMap="request">
+	 	
+	 	select I.userid as userid, I.sc_idx as sc_idx , I.myuserid  as myuserid ,
+	 	S.sc_name  as sc_name from tbl_invite I join tbl_schedule S
+	    on I.sc_idx = S.sc_idx 
+	    where userid =#{userid}
+    
+    </select>
+	
+	
+	
+	<!-- paige --> 
+	<delete id="acceptRequest" parameterType="java.util.HashMap">
+		
+		delete from tbl_invite
+		where userid = #{userid} and sc_idx = #{sc_idx}	
+	</delete>
+
+	
+	<!-- paige --> 
+	<insert id="insertjoin" parameterType="java.util.HashMap"  > 
+		 insert into tbl_join(userid, sc_idx) values (#{userid},#{sc_idx})
+
+	</insert>
+	
+	<!-- paige -->
+	<select id="checkinvite" parameterType="java.util.HashMap" resultType="Integer">
+	 	
+	 	 select count(*) as count from tbl_invite where sc_idx = #{sc_idx} and userid = #{friendid}
+    
+    </select>
+	
+	
+	<!-- paige -->
+	<select id="checkjoin" parameterType="java.util.HashMap" resultType="Integer">
+	 	
+	 	 select count(*) as count from tbl_join where sc_idx = #{sc_idx} and userid = #{friendid}
+    
+    </select>
+    
+    <!-- ============================================================================================= -->
+
+
+	<insert id="stsmsg_insert" parameterType="com.spring.model.MemberVO">   <!-- 회원가입시 상태메시지 -->
+		insert into tbl_statusmsg(userid, statusmsg)
+		values(#{userid}, '상태 메시지를 입력하세요.')
+	</insert>
+	
+	<select id="getMySchedule" resultType="com.spring.model.ScheduleVO" >
+		select s.sc_idx, sc_name, to_char(sc_start_date,'yyyy-mm-dd') as sc_start_date, to_char(sc_end_date,'yyyy-mm-dd') as sc_end_date, sc_days, sc_tag, sc_likecount, sc_viewcount
+		from tbl_schedule s
+		join tbl_join j
+		on s.sc_idx = j.sc_idx
+		<if test="userid != null">
+		where userid = #{userid}
+		order by sc_idx desc
+		</if>
+	</select>
+	
+	<resultMap type="java.util.HashMap" id="getSearchScheduleMap">
+			<result property="SC_IDX" 			column="v.sc_idx"  			javaType="java.lang.String"/>
+			<result property="SC_NAME" 			column="v.sc_name"  			javaType="java.lang.String"/>
+			<result property="SC_START_DATE" 	column="v.sc_start_date"  		javaType="java.lang.String"/>
+			<result property="SC_END_DATe" 		column="v.sc_end_date"  		javaType="java.lang.String"/>
+			<result property="SC_DAYS" 			column="v.sc_days"  		javaType="java.lang.String"/>
+			<result property="SC_TAG" 			column="v.sc_tag"  		javaType="java.lang.String"/>
+			<result property="SC_LIKECOUNT" 	column="v.sc_likecount"  		javaType="java.lang.String"/>
+			<result property="SC_VIEWCOUNT" 	column="v.sc_viewcount"  		javaType="java.lang.String"/>
+			<result property="SC_CHK" 	column="v.chk"  		javaType="java.lang.String"/>
+		</resultMap>
+	
+	<select id="getSearchSchedule" parameterType="Hashmap" resultMap="getSearchScheduleMap" >
+		
+		select v.sc_idx, v.sc_name, v.sc_start_date, v.sc_end_date, v.sc_days, v.sc_tag, v.sc_likecount, v.sc_viewcount, v.chk
+		from
+		(
+		  select row_number()over(order by sc_idx desc) as rno, sc_idx, sc_name, sc_start_date, sc_end_date, sc_days, sc_tag, sc_likecount, sc_viewcount
+		   		<if test="userid != null">
+				       , case when sc_idx in (select sc_idx from tbl_like where userid = #{userid}) then 1 else 0 end as chk
+				</if>
+				<if test="userid == null">
+					   , case when sc_idx in (select sc_idx from tbl_like where userid is null) then 1 else 0 end as chk
+				</if>       
+		  from tbl_schedule
+		  where sc_name like '%' || #{sc_searchWord} || '%' or sc_tag like '%#' || #{sc_searchWord} || '%'
+		)v
+		<![CDATA[
+		where v.rno > to_number(#{pageNum})*6 and v.rno <= to_number(#{pageNum})*6+6
+		]]>
+	</select>
+
+	<insert id="sendMsg">
+    	insert into tbl_chatroom(roomNo, userid, chatMsg, regDate)
+    	values(to_number(#{roomNo}), #{userid}, #{chatMsg}, default)
+	</insert>
+
+	<select id="ck_schedule" resultType="Integer">
+			select count(*) as cnt
+			from tbl_schedule s
+			join tbl_join j
+			on s.sc_idx = j.sc_idx
+			where userid = #{userid} and s.sc_idx = #{sc_idx}
+	</select>
+
+
+     <resultMap type="java.util.HashMap" id="getReadScheduleWishMap">
+   
+		<result property="USERID" 			column="userid"  			javaType="java.lang.String"/>
+		<result property="AREA_CODE" 		column="area_code"  		javaType="java.lang.String"/>
+		<result property="T_IDX" 			column="t_idx"  			javaType="java.lang.String"/>
+		<result property="T_NAME" 			column="t_name"  			javaType="java.lang.String"/>
+		<result property="T_ADDR" 			column="t_addr"  			javaType="java.lang.String"/>
+		<result property="T_RATING" 		column="t_rating"  			javaType="java.lang.String"/>
+		<result property="DE_AREA_CODE" 	column="de_area_code"  		javaType="java.lang.String"/>
+		<result property="T_TYPE" 			column="t_type"  			javaType="java.lang.String"/>
+		<result property="TX" 				column="tx"  				javaType="java.lang.String"/>
+		<result property="TY" 				column="ty"  				javaType="java.lang.String"/>
+		
+	</resultMap>
+   
+     <select id="getReadScheduleWish"  resultMap="getReadScheduleWishMap">
+  
+		select W.userid as userid 
+		  ,D.area_code as area_code 
+		  ,W.t_idx as t_idx
+		  ,T.t_name as t_name
+		  ,T.t_addr as t_addr
+		  ,round(T.t_rating) as t_rating
+		  ,T.t_detail as t_detail
+		  ,T.de_area_code as de_area_code
+		  ,T.t_type as t_type
+		  ,T.tx as tx
+		  ,T.ty as ty
+		from tbl_area_detail D join tbl_tourinfo T
+		on D.de_area_code = T.de_area_code
+		join tbl_wishlist W
+		on T.t_idx = W.t_idx
+		where userid = #{userid}
+		<if test=" areano != 0">
+		and area_code = #{areano}
+		</if>
+	
+	</select>
+
+
+	<select id="getReadScheduleTour"  resultType="com.spring.model.TourInfoVO" parameterType="java.util.List">
+		select t_idx, de_area_code, t_name, t_addr, t_type, round(t_rating) as t_rating, t_start_date, t_end_date, t_detail, tx, ty
+		from tbl_tourinfo
+		where t_idx in ( 
+		
+		 <foreach collection="t_idxarr"  item="item" index="index" >
+             #{item},
+         </foreach>
+         -100)
+         <if test="t_type[0] != null and t_type[0] != 0">
+         	and t_type = #{t_type[0]}
+         </if>
+	</select>
+	
+	<select id="getScheduleMember" resultType="String">
+		select userid from tbl_join where sc_idx = #{sc_idx}
+	</select>
+	
+	 <!-- 회원삭제 -->
+	<update id="updatemember"> 
+		update tbl_member set active = #{active} where userid = #{userid} 
+	</update>
+</mapper>

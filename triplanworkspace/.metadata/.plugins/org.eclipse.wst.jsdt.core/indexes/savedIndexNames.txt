@@ -1,0 +1,14 @@
+INDEX VERSION 1.3+C:\triplanworkspace\.metadata\.plugins\org.eclipse.wst.jsdt.core\indexes
+490378149.index
+2593950231.index
+2665990611.index
+1129276740.index
+888970412.index
+1873497480.index
+461490470.index
+305859592.index
+2225596541.index
+2671639179.index
+2881449047.index
+3445798292.index
+15024142.index
